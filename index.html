@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Онлайн редактор кода для совместного программирования">
+  <title>Совместный редактор кода</title>
+
+  <!-- Подключаем шрифт Fira Code -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Для исправления ошибки 404 для favicon.ico -->
+  <link rel="icon" href="data:,">
+
+  <!-- Font Awesome для иконок -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- SVG фильтры для режимов дальтонизма -->
+  <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <!-- Протанопия (не видит красный) -->
+      <filter id="protanopia-filter">
+        <feColorMatrix
+          type="matrix"
+          values="0.367, 0.633, 0, 0, 0,
+                  0.367, 0.633, 0, 0, 0,
+                  0, 0.167, 0.833, 0, 0,
+                  0, 0, 0, 1, 0" />
+        <feComponentTransfer>
+          <feFuncR type="gamma" exponent="0.9" amplitude="1" offset="0"/>
+          <feFuncG type="gamma" exponent="0.9" amplitude="1" offset="0"/>
+          <feFuncB type="gamma" exponent="0.9" amplitude="1" offset="0"/>
+        </feComponentTransfer>
+      </filter>
+      <!-- Дейтеранопия (не видит зеленый) -->
+      <filter id="deuteranopia-filter">
+        <feColorMatrix
+          type="matrix"
+          values="0.625, 0.375, 0, 0, 0,
+                  0.7, 0.3, 0, 0, 0,
+                  0, 0.3, 0.7, 0, 0,
+                  0, 0, 0, 1, 0" />
+        <feColorMatrix
+          type="saturate"
+          values="0.5" />
+        <feComponentTransfer>
+          <feFuncR type="gamma" exponent="1.2" amplitude="1" offset="0"/>
+          <feFuncG type="gamma" exponent="0.9" amplitude="1" offset="0"/>
+          <feFuncB type="gamma" exponent="1" amplitude="1" offset="0"/>
+        </feComponentTransfer>
+      </filter>
+      <!-- Тританопия (не видит синий) -->
+      <filter id="tritanopia-filter">
+        <feColorMatrix
+          type="matrix"
+          values="1, 0, 0, 0, 0,
+                  0, 0.7, 0.3, 0, 0,
+                  0, 0.7, 0.3, 0, 0,
+                  0, 0, 0, 1, 0" />
+        <feColorMatrix
+          type="saturate"
+          values="0.8" />
+        <feComponentTransfer>
+          <feFuncR type="gamma" exponent="1" amplitude="1" offset="0"/>
+          <feFuncG type="gamma" exponent="1" amplitude="1" offset="0"/>
+          <feFuncB type="gamma" exponent="0.9" amplitude="1" offset="0"/>
+        </feComponentTransfer>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Кнопка доступности -->
+  <button id="accessibility-btn" class="accessibility-btn" aria-label="Настройки доступности" aria-expanded="false" aria-controls="accessibility-panel">
+    <i class="fas fa-universal-access"></i>
+  </button>
+
+  <!-- Панель доступности -->
+  <div id="accessibility-panel" class="accessibility-panel" aria-labelledby="accessibility-heading" role="dialog">
+    <h3 id="accessibility-heading">Настройки доступности</h3>
+
+    <div class="accessibility-section">
+      <h4>Размер шрифта</h4>
+      <div class="accessibility-btn-group">
+        <button id="font-normal" class="font-size-btn active" aria-pressed="true">Обычный</button>
+        <button id="font-large" class="font-size-btn" aria-pressed="false">Большой</button>
+        <button id="font-xlarge" class="font-size-btn" aria-pressed="false">Очень большой</button>
+      </div>
+    </div>
+
+    <div class="accessibility-section">
+      <h4>Контрастность</h4>
+      <div class="accessibility-btn-group">
+        <button id="contrast-normal" class="contrast-btn active" aria-pressed="true">Обычная</button>
+        <button id="contrast-high" class="contrast-btn" aria-pressed="false">Высокая</button>
+      </div>
+    </div>
+
+    <div class="accessibility-section">
+      <h4>Режим для дальтонизма</h4>
+      <select id="colorblind-mode" class="accessibility-select" aria-label="Выберите режим для дальтонизма">
+        <option value="normal">Обычный режим</option>
+        <option value="protanopia">Протанопия (не видит красный)</option>
+        <option value="deuteranopia">Дейтеранопия (не видит зеленый)</option>
+        <option value="tritanopia">Тританопия (не видит синий)</option>
+      </select>
+    </div>
+
+    <div class="accessibility-section">
+      <h4>Анимации</h4>
+      <div class="accessibility-toggle">
+        <input type="checkbox" id="animations-toggle" checked aria-label="Включить или отключить анимации">
+        <label for="animations-toggle">Включить анимации</label>
+      </div>
+    </div>
+
+    <button id="accessibility-reset" class="accessibility-reset">Сбросить настройки</button>
+  </div>
+
+  <!-- Основной контейнер (изначально скрыт) -->
+  <div id="main-content" class="container" role="main" aria-label="Редактор кода" style="display: none;">
+    <div class="left">
+      <div class="editor-instance-container" id="html-editor-container" role="region" aria-label="Редактор HTML">
+        <div class="editor-header">
+          <div class="editor-title">
+            <i class="fa-brands fa-html5" aria-hidden="true"></i>HTML
+            <span id="last-html-editor" class="last-editor"></span>
+          </div>
+        </div>
+        <div id="html-code" aria-label="Редактор HTML кода"></div>
+      </div>
+
+      <div class="editor-instance-container" id="css-editor-container" role="region" aria-label="Редактор CSS">
+        <div class="editor-header">
+          <div class="editor-title">
+            <i class="fa-brands fa-css3-alt" aria-hidden="true"></i>CSS
+            <span id="last-css-editor" class="last-editor"></span>
+          </div>
+        </div>
+        <div id="css-code" aria-label="Редактор CSS кода">
+        </div>
+      </div>
+    </div>
+
+    <div class="right" role="region" aria-label="Результат выполнения кода">
+      <div class="output-container">
+        <label><i class="fa-solid fa-play" aria-hidden="true"></i>Результат</label>
+        <div class="border"><iframe id="output" title="Результат выполнения HTML и CSS кода"></iframe></div>
+      </div>
+      
+      <!-- Счетчик онлайн пользователей -->
+      <div class="online-users" style="margin-top: 20px; padding: 10px; background: rgb(255 227 28 / 85%); border-radius: 8px; text-align: center;">
+        <span id="online-count">0</span> пользователей онлайн
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для входа -->
+  <div id="login-form-modal" class="login-modal">
+    <div class="modal-content login-content">
+        <form id="login-form">
+            <h2>Добро пожаловать!</h2>
+            <p>Введите ваше имя для входа в общую комнату</p>
+            <input type="text" id="user-name" placeholder="Ваше имя" required> 
+            <button type="button" id="login-submit-btn">Войти</button>
+            <p id="error-notification" style="color: red; display: none;"></p>
+        </form>
+    </div>
+  </div>
+
+  <!-- Подключаем Socket.io -->
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+
+  <!-- Подключаем Monaco Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Предотвращаем повторную инициализацию
+      if (!window.monacoLoadingStarted) {
+        window.monacoLoadingStarted = true;
+        
+        console.log('[Monaco] Начинаем загрузку Monaco Editor...');
+        console.log('[Monaco] require доступен:', typeof require !== 'undefined');
+
+        // Проверяем доступность require
+        if (typeof require === 'undefined') {
+          console.error('[Monaco] require не определен, Monaco Editor не может быть загружен!');
+          return;
+        }
+
+        require.config({
+          paths: {
+            'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'
+          }
+        });
+
+        require(['vs/editor/editor.main'], function(monacoInstance) {
+          window.monaco = monacoInstance;
+          console.log('[Monaco] Monaco Editor успешно загружен');
+          console.log('[Monaco] Доступные языки:', window.monaco.languages.getLanguages().map(l => l.id));
+          
+          // Генерируем событие, что Monaco готов
+          window.dispatchEvent(new CustomEvent('monaco_loaded')); 
+          console.log('[Monaco] Событие "monaco_loaded" отправлено');
+        }, function(error) {
+            console.error('[Monaco] Ошибка при загрузке Monaco:', error);
+            
+            // Попробуем альтернативный способ через прямое подключение
+            console.log('[Monaco] Пытаемся загрузить Monaco альтернативным способом...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.js';
+            script.onload = function() {
+              if (window.monaco) {
+                console.log('[Monaco] Monaco загружен альтернативным способом');
+                window.dispatchEvent(new CustomEvent('monaco_loaded'));
+              }
+            };
+            script.onerror = function() {
+              console.error('[Monaco] Не удалось загрузить Monaco ни одним способом');
+            };
+            document.head.appendChild(script);
+        });
+      }
+    });
+  </script>
+
+  <!-- Наши модули -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html> 
