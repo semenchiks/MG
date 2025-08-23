@@ -1,0 +1,2005 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', 'Arial', sans-serif;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-color: #ffffff;
+    --text-color: #222;
+    --editor-bg: #f8f8f8;
+    --border-color: #ffe000;
+    --error-color: #ff4444;
+    --success-color: #00C851;
+    --transition-speed: 0.3s;
+    --button-color: #ffe000;
+    --button-size: 120px;
+    --font-size-base: 16px;
+    --font-size-small: 14px;
+    --font-size-large: 18px;
+    --yellow-primary: #ffe000;
+    --yellow-hover: #ffd600;
+
+    /* Переменные для доступности */
+    --font-size-factor: 1;
+    --contrast-factor: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #ffffff;
+        --text-color: #222;
+        --editor-bg: #f8f8f8;
+        --border-color: #ffe000;
+    }
+}
+
+html {
+    font-size: 100%;
+}
+
+body {
+    background: #ffffff;
+    color: var(--text-color);
+    overflow: hidden;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Декоративные желтые элементы как на других страницах */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle at 60px 60px, #ffe000 60%, transparent 100%);
+    border-radius: 0 0 120px 0;
+    opacity: 0.18;
+    z-index: 1;
+    pointer-events: none;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 220px;
+    height: 220px;
+    background: linear-gradient(135deg, #ffe000 60%, transparent 100%);
+    border-radius: 0 0 0 180px;
+    opacity: 0.18;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Дополнительные декоративные элементы */
+.container::before {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(225deg, #ffe000 60%, transparent 100%);
+    border-radius: 0 160px 0 0;
+    opacity: 0.18;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.container::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle at 120px 120px, #ffe000 60%, transparent 100%);
+    border-radius: 160px 0 0 0;
+    opacity: 0.18;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Overlay для инициализации кода */
+/* Удалены стили .init-overlay, .init-status, .init-animation-container, #online-users-count */
+
+/* Стили для точек загрузки */
+.loading-dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: var(--button-color);
+    border-radius: 50%;
+    display: inline-block;
+    animation: dots 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dots {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.3;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Обновленные стили для статуса инициализации */
+/* Удалены стили .init-status, .init-status.show */
+
+.particle {
+    position: absolute;
+    background-color: #50fa7b;
+    border-radius: 50%;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: particleAnimation 1s ease-out forwards;
+}
+
+@keyframes particleAnimation {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.code-particle {
+    position: absolute;
+    font-size: 16px;
+    font-family: monospace;
+    opacity: 0;
+    transform: scale(0.5);
+    animation: codeParticleAnimation 1s ease-out forwards;
+}
+
+@keyframes codeParticleAnimation {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+.code-path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawPath 1.5s ease-out forwards;
+}
+
+@keyframes drawPath {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Layout */
+.container {
+    width: 100%;
+    height: 100vh;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.left {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    gap: 15px;
+    position: relative;
+    z-index: 15;
+}
+
+.right {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 15;
+}
+
+.right .border {
+    flex: 1;
+    display: flex;
+    height: calc(100% - 30px);
+    border: 3px solid var(--yellow-primary);
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.2);
+    background: #ffffff;
+    position: relative;
+    z-index: 20;
+}
+
+.right iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #ffffff;
+}
+
+
+.editor-instance-container {
+    background: #ffffff;
+    border: 3px solid var(--yellow-primary);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.2);
+    position: relative;
+    z-index: 20;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--yellow-primary) 0%, var(--yellow-hover) 100%);
+    color: #222;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--yellow-hover);
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(255, 224, 0, 0.3);
+    user-select: none;
+}
+
+.editor-title {
+    display: flex;
+    align-items: center;
+}
+
+.editor-title i {
+    margin-right: 6px;
+    font-size: 16px;
+}
+
+.editor-title .fa-html5 {
+    color: #e44d26;
+}
+
+.editor-title .fa-css3-alt {
+    color: #264de4;
+}
+
+.editor-actions {
+    display: flex;
+    align-items: center;
+}
+
+
+
+/* Стили для iframe */
+/* Добавляем стиль для body внутри iframe */
+iframe {
+    color-scheme: dark;
+}
+
+iframe html, iframe body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Отзывчивый дизайн для мобильных устройств */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .left, .right {
+        width: 100%;
+    }
+
+    .right {
+        margin-top: 10px;
+    }
+    
+
+}
+
+/* Labels */
+label i {
+    margin-right: 10px;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    background: var(--yellow-primary);
+    color: #222;
+    height: 30px;
+    padding: 0 10px;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+    transition: background-color var(--transition-speed);
+}
+
+/* Error notification */
+.error-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: #ffffff;
+    color: #ff5252;
+    border: 2px solid #ff5252;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(255, 82, 82, 0.3);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all var(--transition-speed);
+    z-index: 1000;
+    font-weight: 600;
+}
+
+.error-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Success notification */
+.success-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: #ffffff;
+    color: #00C851;
+    border: 2px solid #00C851;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 200, 81, 0.3);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all var(--transition-speed);
+    z-index: 1000;
+    font-weight: 600;
+}
+
+.success-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Стили для модального окна входа */
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 11000;
+}
+
+.login-content {
+    background: #ffffff;
+    border: 3px solid var(--yellow-primary);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(255, 224, 0, 0.3);
+    text-align: center;
+    max-width: 90%;
+    width: 400px;
+    position: relative;
+}
+
+.login-content h2 {
+    margin-bottom: 20px;
+    color: #222;
+    font-weight: 700;
+}
+
+.login-content p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.login-btn {
+    background: var(--button-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+    background: #a881f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.solo-mode-btn {
+    background: #50fa7b;
+}
+
+.solo-mode-btn:hover {
+    background: #3ad66a;
+}
+
+/* Стили для кнопки выхода */
+.logout-btn {
+    display: none; /* Изначально скрыта */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #ff5252;
+    color: white;
+    border: 2px solid #ff5252;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+    z-index: 9000;
+    box-shadow: 0 4px 16px rgba(255, 82, 82, 0.3);
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #ff3030;
+    border-color: #ff3030;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 82, 82, 0.5);
+}
+
+.logout-btn i {
+    font-size: 16px;
+}
+
+/* Стили для кнопки и панели доступности */
+.accessibility-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--yellow-primary);
+    color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 99999;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.4);
+    border: 2px solid #222;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    pointer-events: auto !important;
+}
+
+.accessibility-btn:hover {
+    background: var(--yellow-hover);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 224, 0, 0.6);
+}
+
+.accessibility-btn:focus {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+.accessibility-panel {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    width: 300px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 3px solid var(--yellow-primary);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(255, 224, 0, 0.3);
+    z-index: 99998;
+    transform: translateY(20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: auto !important;
+}
+
+.accessibility-panel.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.accessibility-panel h3 {
+    color: #222;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--yellow-primary);
+    padding-bottom: 10px;
+}
+
+.accessibility-section {
+    margin-bottom: 20px;
+}
+
+.accessibility-section h4 {
+    color: #444;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.accessibility-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.accessibility-btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+.accessibility-btn-group button {
+    background: #f8f8f8;
+    color: #222;
+    border: 2px solid #ddd;
+    padding: 8px 12px !important;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px !important;
+    font-weight: 500;
+    width: auto !important;
+    height: auto !important;
+}
+
+.accessibility-btn-group button:hover {
+    background: var(--yellow-primary);
+    border-color: var(--yellow-primary);
+    color: #222;
+}
+
+.accessibility-btn-group button.active {
+    background: var(--yellow-primary);
+    border-color: var(--yellow-primary);
+    color: #222;
+    font-weight: 700;
+}
+
+.accessibility-select {
+    background: #f8f8f8;
+    color: #222;
+    border: 2px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.accessibility-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.accessibility-toggle label {
+    background: transparent;
+    padding: 0;
+    height: auto;
+}
+
+.accessibility-toggle input[type="checkbox"] {
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background: #ddd;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.accessibility-toggle input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    top: 1px;
+    left: 1px;
+    background: #666;
+    transition: all 0.3s ease;
+}
+
+.accessibility-toggle input[type="checkbox"]:checked {
+    background: var(--yellow-primary);
+    border-color: var(--yellow-primary);
+}
+
+.accessibility-toggle input[type="checkbox"]:checked::before {
+    left: 21px;
+    background: #222;
+}
+
+.accessibility-reset {
+    width: 100% !important;
+    background: #ff5252;
+    color: #fff;
+    border: 2px solid #ff5252;
+    padding: 10px !important;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+    font-size: 14px !important;
+    font-weight: 600;
+    height: auto !important;
+}
+
+.accessibility-reset:hover {
+    background: #ff3030;
+    border-color: #ff3030;
+}
+
+.login-content {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeIn 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+        rgba(189, 147, 249, 0.1),
+        rgba(255, 121, 198, 0.1),
+        rgba(80, 250, 123, 0.1)
+    );
+    z-index: 0;
+}
+
+.login-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+.login-content h2 {
+    color: #2c2c2c;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 1px;
+}
+
+.login-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.login-btn,
+.guest-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all var(--transition-speed);
+}
+
+.login-btn {
+    background: linear-gradient(145deg, var(--yellow-primary), var(--yellow-hover));
+    color: #222;
+    padding: 12px 30px;
+    border: 2px solid #222;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 224, 0, 0.3);
+}
+
+.login-btn:hover {
+    background: linear-gradient(145deg, var(--yellow-hover), #ffcc00);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 224, 0, 0.5);
+}
+
+.login-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 224, 0, 0.4);
+}
+
+.guest-btn {
+    background: var(--yellow-primary);
+    color: #222;
+    border: 2px solid #222;
+}
+
+.login-btn:hover,
+.guest-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для формы входа */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid rgba(255, 224, 0, 0.5);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #222;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--yellow-primary);
+    box-shadow: 0 0 0 3px rgba(255, 224, 0, 0.3);
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all var(--transition-speed);
+}
+
+.form-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для курсоров */
+.cursor {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: all 0.1s ease;
+}
+
+.cursor-label {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Добавим стили для индикатора сохранения */
+.last-editor {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-left: 5px;
+    transition: all 0.3s ease;
+}
+
+.last-editor.updated {
+    color: #4caf50;
+    font-weight: bold;
+    animation: fadeInOut 2s ease;
+}
+
+.last-editor.saving {
+    color: #2196f3;
+    animation: pulseSaving 1.5s infinite;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+@keyframes pulseSaving {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Кнопка форматирования кода */
+.format-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--yellow-primary);
+    color: #222;
+    border: 2px solid #222;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.format-btn:hover {
+    background: var(--yellow-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 224, 0, 0.6);
+}
+
+.format-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 12px rgba(255, 224, 0, 0.4);
+}
+
+/* Добавляем стили для анимации потока кода */
+@keyframes float-code {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-40px) scale(0.8); opacity: 0; }
+}
+
+.code-particle {
+    position: absolute;
+    font-family: monospace;
+    color: var(--button-color);
+    pointer-events: none;
+}
+
+
+/* Улучшенная адаптивность для различных устройств */
+/* Мобильные телефоны (портретная ориентация) */
+@media (max-width: 576px) {
+    .container {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .left, .right {
+        flex-basis: auto;
+        padding: 5px;
+    }
+
+    .left {
+        height: 60vh;
+    }
+
+    .right {
+        height: 40vh;
+    }
+
+    .error-notification, .success-notification {
+        left: 10px;
+        right: 10px;
+        width: auto;
+        text-align: center;
+    }
+
+    .format-btn {
+        bottom: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .login-content {
+        padding: 20px;
+    }
+
+    .form-buttons button {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .button-content {
+        font-size: 2rem;
+    }
+
+    .button-label {
+        font-size: 14px;
+    }
+
+    .init-button {
+        --button-size: 100px;
+    }
+}
+
+/* Мобильные телефоны (альбомная ориентация) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .container {
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .left, .right {
+        padding: 5px;
+    }
+}
+
+/* Планшеты */
+@media (min-width: 768px) and (max-width: 991px) {
+    .container {
+        gap: 15px;
+    }
+}
+
+/* Настольные компьютеры с маленьким экраном */
+@media (min-width: 992px) and (max-width: 1199px) {
+    /* Настройки для десктопных устройств с маленьким экраном */
+}
+
+/* Настольные компьютеры с большим экраном */
+@media (min-width: 1200px) {
+    /* Настройки для больших десктопных устройств */
+}
+
+/* Настройки для устройств с высокой плотностью пикселей */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    html {
+        font-size: 110%;
+    }
+}
+
+/* Настройки для устройств с сенсорным экраном */
+@media (hover: none) {
+    .format-btn:hover, .login-btn:hover, .guest-btn:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+/* Кнопка выхода - дополнительные стили */
+.logout-btn {
+    transition: all 0.3s ease;
+}
+
+.logout-btn:active {
+    transform: scale(0.9);
+}
+
+.code-part {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: scale(0.9);
+}
+
+.image-container:hover .code-part {
+    display: block;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.image-container {
+    position: relative;
+}
+
+.code-part {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.init-button {
+    width: var(--button-size, 120px);
+    height: var(--button-size, 120px);
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--yellow-primary), var(--yellow-hover));
+    border: 3px solid #222;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(189, 147, 249, 0.4);
+    transition: all 0.3s ease;
+}
+
+.init-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(189, 147, 249, 0.6);
+}
+
+.init-button:active {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(189, 147, 249, 0.4);
+}
+
+.button-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.button-label {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-top: 8px;
+}
+
+/* Стили для отображения результата рядом с полноэкранным редактором удалены */
+
+@media (max-width: 768px) {
+    /* Мобильный режим */
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .left, .right {
+        width: 100%;
+        height: auto;
+    }
+
+    .right {
+        height: 300px;
+    }
+
+    .mobile-layout .left {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobile-device .editor-title {
+        font-size: 14px;
+    }
+
+    .mobile-device .editor-actions button {
+        padding: 4px 6px;
+    }
+
+    /* Улучшения для сенсорных устройств */
+    .mobile-device button,
+    .mobile-device .login-btn {
+        min-height: 44px; /* Рекомендуемый минимальный размер для touch target */
+    }
+
+    .mobile-device input[type="text"] {
+        font-size: 16px; /* Предотвращает зум на iOS при фокусе */
+        min-height: 44px;
+    }
+
+    /* Корректировка модального окна входа для мобильных устройств */
+    .mobile-device .login-content {
+        width: 90%;
+        max-width: 320px;
+    }
+}
+
+/* Добавляем анимацию для обновления индикатора редактора */
+.last-editor.updated {
+    animation: pulse 0.5s ease;
+}
+
+/* Улучшенные стили для мобильных устройств */
+.mobile-device .login-modal {
+    align-items: flex-start;
+    padding-top: 10vh;
+}
+
+/* Оптимизация перетаскивания разделителя */
+.resizer {
+    background-color: var(--border-color);
+    cursor: col-resize;
+    width: 8px;
+    margin: 0 -4px;
+    z-index: 2;
+    position: relative;
+}
+
+.resizer:hover {
+    background-color: var(--button-color);
+}
+
+/* Уведомления */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.notification {
+    width: 300px;
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    border-left: 4px solid #4CAF50;
+}
+
+.notification.error {
+    border-left: 4px solid #F44336;
+}
+
+.notification.merge {
+    border-left: 4px solid #2196F3;
+    background-color: #e3f2fd;
+}
+
+.notification-icon {
+    margin-right: 12px;
+    font-size: 20px;
+}
+
+.notification.success .notification-icon {
+    color: #4CAF50;
+}
+
+.notification.error .notification-icon {
+    color: #F44336;
+}
+
+.notification.merge .notification-icon {
+    color: #2196F3;
+}
+
+.notification-message {
+    flex: 1;
+    font-size: 14px;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aaa;
+    font-size: 16px;
+    padding: 0;
+    margin-left: 8px;
+}
+
+.notification-close:hover {
+    color: #555;
+}
+
+/* Оптимизированные анимации */
+@keyframes pulse {
+    0% { opacity: 0.5; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Стили для полноэкранного режима редакторов удалены */
+
+/* Стили для редактора Monaco */
+.monaco-editor, .monaco-editor .overflow-guard {
+    border-radius: 0;
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* Дополнительные стили для Monaco Editor */
+.monaco-editor {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    border-radius: 0 0 12px 12px !important;
+    overflow: hidden !important;
+}
+
+.monaco-editor .overflow-guard {
+    border-radius: 0 0 12px 12px !important;
+}
+
+/* Улучшение скроллбаров */
+.monaco-editor .scrollbar .slider {
+    border-radius: 6px !important;
+}
+
+/* Стили для номеров строк */
+.monaco-editor .margin {
+    background-color: #F7FAFC !important;
+    border-right: 1px solid #E2E8F0 !important;
+}
+
+/* Улучшение подсветки синтаксиса */
+.monaco-editor .token.tag {
+    font-weight: 600 !important;
+}
+
+.monaco-editor .token.attribute-name {
+    font-weight: 500 !important;
+}
+
+.monaco-editor .token.comment {
+    font-style: italic !important;
+    opacity: 0.8 !important;
+}
+
+/* Стили для автодополнения */
+.monaco-editor .suggest-widget {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+.monaco-editor .suggest-widget .monaco-list .monaco-list-row {
+    border-radius: 4px !important;
+    margin: 2px 4px !important;
+}
+
+/* Стили для всплывающих подсказок */
+.monaco-editor .monaco-hover {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+/* Улучшение курсора */
+.monaco-editor .cursor {
+    width: 2px !important;
+}
+
+/* Стили для выделения */
+.monaco-editor .selected-text {
+    border-radius: 3px !important;
+}
+
+/* Анимации для плавности */
+.monaco-editor .view-line {
+    transition: background-color 0.2s ease !important;
+}
+
+/* Стили для поиска */
+.monaco-editor .find-widget {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+/* Улучшение контрастности для лучшей читаемости */
+.monaco-editor .view-lines {
+    font-feature-settings: 'liga' 1, 'calt' 1 !important;
+}
+
+.diff-insert {
+  background-color: rgba(0, 255, 0, 0.2);
+  text-decoration: none;
+  animation: fadeOut 3s forwards;
+  border-radius: 2px;
+}
+
+.diff-delete {
+  background-color: rgba(255, 0, 0, 0.2);
+  text-decoration: line-through;
+  opacity: 0.7;
+  border-radius: 2px;
+}
+
+/* Стили для близких диапазонов */
+.diff-close {
+  border-bottom: 1px dotted rgba(255, 165, 0, 0.6);
+  position: relative;
+}
+
+.diff-close::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: rgba(255, 165, 0, 0.4);
+}
+
+/* Стили для режимов доступности */
+
+/* Размер шрифта */
+html.font-size-normal {
+    --font-size-factor: 1;
+}
+
+html.font-size-large {
+    --font-size-factor: 1.25;
+}
+
+html.font-size-xlarge {
+    --font-size-factor: 1.5;
+}
+
+/* Применяем размер шрифта */
+html.font-size-large {
+    font-size: calc(var(--font-size-base) * 1.25);
+}
+
+html.font-size-xlarge {
+    font-size: calc(var(--font-size-base) * 1.5);
+}
+
+/* Применяем размер шрифта к всем элементам, кроме панели доступности */
+html.font-size-large *, html.font-size-xlarge * {
+    font-size: inherit;
+}
+
+/* Фиксированный размер шрифта для панели доступности */
+.accessibility-panel,
+.accessibility-panel *,
+.accessibility-btn {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+}
+
+/* Фиксированные размеры элементов панели доступности */
+.accessibility-panel h3 {
+    font-size: 18px !important;
+    margin-bottom: 15px !important;
+}
+
+.accessibility-panel h4 {
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+}
+
+.accessibility-btn-group button {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+}
+
+.accessibility-select {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+}
+
+.accessibility-toggle label {
+    font-size: 14px !important;
+}
+
+.accessibility-reset {
+    font-size: 14px !important;
+    padding: 10px !important;
+}
+
+/* Исключаем панель доступности из наследования размера шрифта */
+html.font-size-large .accessibility-panel,
+html.font-size-large .accessibility-btn,
+html.font-size-xlarge .accessibility-panel,
+html.font-size-xlarge .accessibility-btn {
+    transform: none !important;
+}
+
+/* Фиксированные размеры для панели доступности */
+.accessibility-panel {
+    width: 350px !important;
+    padding: 20px !important;
+}
+
+.accessibility-btn {
+    width: 50px !important;
+    height: 50px !important;
+}
+
+/* Увеличиваем размер кнопок и инпутов (кроме панели доступности) */
+html.font-size-large button:not(.accessibility-panel *):not(.accessibility-btn),
+html.font-size-large input:not(.accessibility-panel *),
+html.font-size-large select:not(.accessibility-panel *),
+html.font-size-large textarea:not(.accessibility-panel *),
+html.font-size-large .login-btn:not(.accessibility-panel *),
+html.font-size-large .reset-button:not(.accessibility-panel *) {
+    font-size: calc(var(--font-size-base) * 1.25);
+    padding: 0.8em 1.2em;
+}
+
+html.font-size-xlarge button:not(.accessibility-panel *):not(.accessibility-btn),
+html.font-size-xlarge input:not(.accessibility-panel *),
+html.font-size-xlarge select:not(.accessibility-panel *),
+html.font-size-xlarge textarea:not(.accessibility-panel *),
+html.font-size-xlarge .login-btn:not(.accessibility-panel *),
+html.font-size-xlarge .reset-button:not(.accessibility-panel *) {
+    font-size: calc(var(--font-size-base) * 1.5);
+    padding: 0.9em 1.3em;
+}
+
+/* Высокая контрастность */
+html.contrast-high {
+    filter: contrast(1.4);
+}
+
+html.contrast-high body {
+    background: #000;
+    color: #fff;
+}
+
+html.contrast-high .editor-header,
+html.contrast-high label {
+    background: #000;
+    color: #fff;
+    border-color: #fff;
+}
+
+html.contrast-high .accessibility-btn-group button,
+html.contrast-high .accessibility-select,
+html.contrast-high .accessibility-toggle input[type="checkbox"] {
+    background: #000;
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+html.contrast-high .accessibility-btn-group button.active {
+    background: #fff;
+    color: #000;
+}
+
+/* Режимы дальтонизма */
+/* Применяем фильтры дальтонизма селективно, исключая Monaco редакторы */
+html.colorblind-protanopia body::before,
+html.colorblind-protanopia body::after,
+html.colorblind-protanopia .container::before,
+html.colorblind-protanopia .container::after,
+html.colorblind-protanopia .right,
+html.colorblind-protanopia .editor-header,
+html.colorblind-protanopia .accessibility-panel,
+html.colorblind-protanopia .accessibility-btn,
+html.colorblind-protanopia .login-modal {
+    filter: url('#protanopia-filter');
+}
+
+html.colorblind-deuteranopia body::before,
+html.colorblind-deuteranopia body::after,
+html.colorblind-deuteranopia .container::before,
+html.colorblind-deuteranopia .container::after,
+html.colorblind-deuteranopia .right,
+html.colorblind-deuteranopia .editor-header,
+html.colorblind-deuteranopia .accessibility-panel,
+html.colorblind-deuteranopia .accessibility-btn,
+html.colorblind-deuteranopia .login-modal {
+    filter: url('#deuteranopia-filter');
+}
+
+html.colorblind-tritanopia body::before,
+html.colorblind-tritanopia body::after,
+html.colorblind-tritanopia .container::before,
+html.colorblind-tritanopia .container::after,
+html.colorblind-tritanopia .right,
+html.colorblind-tritanopia .editor-header,
+html.colorblind-tritanopia .accessibility-panel,
+html.colorblind-tritanopia .accessibility-btn,
+html.colorblind-tritanopia .login-modal {
+    filter: url('#tritanopia-filter');
+}
+
+/* Специальные стили для Monaco редакторов в режимах дальтонизма */
+html.colorblind-protanopia .monaco-editor .view-lines,
+html.colorblind-protanopia .monaco-editor .overflow-guard {
+    filter: url('#protanopia-filter');
+}
+
+html.colorblind-deuteranopia .monaco-editor .view-lines,
+html.colorblind-deuteranopia .monaco-editor .overflow-guard {
+    filter: url('#deuteranopia-filter');
+}
+
+html.colorblind-tritanopia .monaco-editor .view-lines,
+html.colorblind-tritanopia .monaco-editor .overflow-guard {
+    filter: url('#tritanopia-filter');
+}
+
+/* Убеждаемся, что основные контейнеры Monaco остаются интерактивными */
+html.colorblind-protanopia .monaco-editor,
+html.colorblind-deuteranopia .monaco-editor,
+html.colorblind-tritanopia .monaco-editor,
+html.colorblind-protanopia .editor-instance-container,
+html.colorblind-deuteranopia .editor-instance-container,
+html.colorblind-tritanopia .editor-instance-container {
+    filter: none !important;
+    pointer-events: auto !important;
+}
+
+/* Дополнительная защита для редакторов */
+.monaco-editor,
+.editor-instance-container,
+#html-code,
+#css-code {
+    pointer-events: auto !important;
+    user-select: text !important;
+}
+
+/* Стили для контейнеров Monaco Editor */
+#html-code,
+#css-code {
+    flex: 1;
+    height: 100%;
+    min-height: 150px;
+    background: #ffffff;
+}
+
+/* Обеспечиваем интерактивность при любых изменениях доступности */
+html.font-size-large .monaco-editor,
+html.font-size-xlarge .monaco-editor,
+html.contrast-high .monaco-editor,
+html.reduce-animations .monaco-editor {
+    pointer-events: auto !important;
+    user-select: text !important;
+}
+
+/* Уменьшение анимаций */
+html.reduce-animations * {
+    animation-duration: 0.001s !important;
+    transition-duration: 0.001s !important;
+}
+
+/* Дополнительные улучшения доступности */
+:focus {
+    outline: 3px solid var(--button-color);
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+:focus-visible {
+    outline: 3px solid var(--button-color);
+    outline-offset: 2px;
+}
+
+/* Улучшения для кнопок и ссылок */
+button, a, .login-btn, .reset-button, .back-link {
+    transition: all 0.2s ease;
+}
+
+button:hover, a:hover, .login-btn:hover, .reset-button:hover, .back-link:hover {
+    transform: scale(1.05);
+}
+
+button:active, a:active, .login-btn:active, .reset-button:active, .back-link:active {
+    transform: scale(0.98);
+}
+
+
+/* Улучшения для режима высокой контрастности */
+html.contrast-high button,
+html.contrast-high .login-btn,
+html.contrast-high .reset-button,
+html.contrast-high .back-link {
+    border: 2px solid #fff;
+    text-shadow: none;
+}
+
+html.contrast-high .accessibility-btn {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+}
+
+/* Дополнительные улучшения для режима высокой контрастности */
+html.contrast-high .editor-header {
+    border-bottom: 2px solid #fff;
+}
+
+
+
+html.contrast-high .accessibility-panel {
+    border: 2px solid #fff;
+    background: #000;
+}
+
+html.contrast-high .accessibility-section h4 {
+    color: #fff;
+}
+
+html.contrast-high .accessibility-btn-group button {
+    border: 2px solid #fff;
+}
+
+html.contrast-high .accessibility-btn-group button.active {
+    background: #fff;
+    color: #000;
+    font-weight: bold;
+}
+
+/* Yjs Monaco Remote Cursors and Selections */
+.yRemoteSelection {
+  background-color: rgba(0, 80, 255, 0.15); /* Полупрозрачный синий для выделения */
+}
+
+.yRemoteSelectionHead {
+  position: absolute;
+  border-left: 2px solid rgb(0, 80, 255); /* Сплошная синяя линия для курсора */
+  border-top: 2px solid rgb(0, 80, 255); /* Добавляем верхнюю часть для видимости */
+  border-bottom: 2px solid rgb(0, 80, 255); /* Добавляем нижнюю часть для видимости */
+  height: 100%; /* Высота курсора по высоте строки */
+  box-sizing: border-box;
+  pointer-events: none; /* Чтобы не мешал кликам */
+}
+
+/* Стили для отображения имени пользователя рядом с курсором */
+/* y-monaco автоматически добавляет 'title' атрибут, но для кастомного отображения имени */
+/* как в примере из документации, нужны стили для .yRemoteSelectionHead-${clientId}::before или ::after */
+/* которые должны генерироваться динамически на основе awareness.user.name и awareness.user.color */
+
+/* Базовый стиль для "флажка" с именем, если он будет добавляться y-monaco или вручную */
+.yRemoteSelectionHead::after {
+    content: attr(data-yjs-username); /* Предположим, что имя пользователя будет в data-атрибуте */
+    position: absolute;
+    left: -2px; /* Немного левее линии курсора */
+    top: -1.4em; /* Выше строки текста */
+    background-color: rgb(0, 80, 255); /* Тот же синий, что и курсор */
+    color: white;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+    z-index: 10; /* Чтобы быть поверх других элементов редактора */
+    pointer-events: none;
+    font-family: sans-serif; /* Читаемый шрифт */
+}
+
+/* Скрытие ::after по умолчанию, если имя пользователя не установлено */
+.yRemoteSelectionHead:not([data-yjs-username])::after {
+    display: none;
+}
+
+.login-content input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    border: 2px solid rgba(255, 224, 0, 0.5);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #222;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(255, 224, 0, 0.1);
+}
+
+.login-content input[type="text"]:focus {
+    border: 2px solid var(--yellow-primary);
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(255, 224, 0, 0.3);
+    color: #222;
+}
+
+.login-content input[type="text"]::placeholder {
+    color: #888;
+    opacity: 1;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+}
+
+#login-submit-btn {
+    width: 100%;
+    padding: 12px 0;
+    background: linear-gradient(145deg, var(--yellow-primary), var(--yellow-hover));
+    color: #222;
+    border: 2px solid #222;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.3);
+    transition: all 0.3s ease;
+    margin-top: 6px;
+}
+
+#login-submit-btn:hover, #login-submit-btn:focus {
+    background: linear-gradient(145deg, var(--yellow-hover), #ffcc00);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(255, 224, 0, 0.5);
+    outline: none;
+}
+
+.save-to-profile-btn {
+  position: absolute;
+  right: 32px;
+  bottom: 32px;
+  z-index: 10000;
+  background: #ffe000;
+  color: #111;
+  font-size: 1em;
+  font-weight: 700;
+  border: 2px solid #222;
+  border-radius: 12px;
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 224, 0, 0.4);
+  transition: all 0.3s ease;
+}
+.save-to-profile-btn:hover {
+  background: #ffd600;
+  color: #000;
+  box-shadow: 0 6px 24px #ffe00077;
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Обертка для Output */
+.output-container {
+    background: #ffffff;
+    border: 3px solid var(--yellow-primary);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.2);
+    position: relative;
+    z-index: 20;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.output-container label {
+    border-radius: 8px 8px 0 0;
+    margin: 0;
+}
+
+.output-container .border {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    z-index: auto;
+}
+
+
+
+/* Глобальные курсоры пользователей */
+#global-cursor-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+/* Стили для курсоров пользователей с эмодзи */
+.user-cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    /* Более плавные переходы для курсора */
+    transition: transform 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.user-cursor .cursor-emoji {
+    font-size: 2em;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
+    animation: cursorPulse 2s infinite ease-in-out;
+}
+
+.user-cursor .cursor-name {
+    background: var(--yellow-primary);
+    color: #222;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    border: 1px solid #222;
+}
+
+/* Анимация для курсоров */
+@keyframes cursorPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Стили для заметок пользователей */
+.user-note {
+    position: fixed;
+    z-index: 10002;
+    background: #fff;
+    border: 2px solid var(--yellow-primary);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(255, 224, 0, 0.3);
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #222;
+    display: flex;
+    align-items: center;
+    pointer-events: auto;
+    max-width: 320px;
+    word-break: break-word;
+    animation: noteAppear 0.3s ease-out;
+}
+
+.user-note .note-emoji {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.user-note .note-author {
+    margin-right: 8px;
+    font-size: 1.4em;
+}
+
+.user-note .note-text {
+    flex: 1;
+    font-weight: 500;
+}
+
+.user-note .note-close {
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+    transition: color 0.2s ease;
+    font-weight: bold;
+    padding: 0 4px;
+    border-radius: 4px;
+}
+
+.user-note .note-close:hover {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+}
+
+/* Анимация появления заметок */
+@keyframes noteAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Адаптивные стили для курсоров на мобильных */
+@media (max-width: 768px) {
+    .user-cursor .cursor-emoji {
+        font-size: 1.5em;
+    }
+    
+    .user-cursor .cursor-name {
+        font-size: 11px;
+        padding: 1px 4px;
+        margin-left: 4px;
+    }
+    
+    .user-note {
+        max-width: 250px;
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+    
+    .user-note .note-emoji,
+    .user-note .note-author {
+        font-size: 1.1em;
+    }
+}
