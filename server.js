@@ -349,44 +349,31 @@ io.on('connection', (socket) => {
   });
 });
 
-// --- Простое решение: используем отдельный порт только в разработке ---
-// В продакшене будем использовать Socket.IO для Yjs синхронизации
+// --- Единый Yjs WebSocket сервер (для dev и prod) на том же HTTP-порте ---
+let yWebSocketServer = new WebSocketServer({ noServer: true });
 
-if (process.env.NODE_ENV !== 'production') {
-  // В разработке создаем отдельный WebSocket сервер на порту 3001
-  const yWebSocketServer = new WebSocketServer({ 
-    port: process.env.YJS_PORT || 3001,
-    host: '0.0.0.0' // Слушаем все интерфейсы
-  });
-  log('Режим разработки: Yjs WebSocket сервер на отдельном порту 3001 (все интерфейсы)');
+httpServer.on('upgrade', (request, socket, head) => {
+  try {
+    const url = new URL(request.url, `ws://${request.headers.host}`);
+    if (url.pathname !== '/yjs') {
+      socket.destroy();
+      return;
+    }
 
-  // Функция для получения или создания Yjs документа
-  const getOrCreateDoc = (docName) => {
-    return new Y.Doc();
-  };
-
-  yWebSocketServer.on('connection', (websocket, request) => {
-    try {
-      const url = new URL(request.url, `ws://${request.headers.host}`);
+    yWebSocketServer.handleUpgrade(request, socket, head, (websocket) => {
       const docName = url.searchParams.get('doc') || 'main';
-      
-      log(`Yjs WebSocket соединение для документа: ${docName}`);
-      
+      log(`Yjs WebSocket upgrade для документа: ${docName}`);
       setupWSConnection(websocket, request, {
         docName,
-        gc: true,
-        getDoc: getOrCreateDoc
+        gc: true
+        // Хранилище документов ведется внутри @y/websocket-server
       });
-      
-    } catch (error) {
-      log(`Ошибка при обработке WebSocket соединения: ${error.message}`, 'error');
-      websocket.close(1011, 'Server error');
-    }
-  });
-} else {
-  // В продакшене используем Socket.IO для Yjs синхронизации
-  log('Режим продакшена: Yjs синхронизация через Socket.IO');
-}
+    });
+  } catch (error) {
+    log(`Ошибка upgrade WebSocket: ${error.message}`, 'error');
+    socket.destroy();
+  }
+});
 
 // Запуск сервера
 const PORT = process.env.PORT || 3000;
@@ -413,11 +400,7 @@ httpServer.listen(PORT, '0.0.0.0', () => {
     }
   });
   
-  if (process.env.NODE_ENV !== 'production') {
-    log(`Yjs WebSocket сервер запущен на отдельном порту ${process.env.YJS_PORT || 3001} (все интерфейсы)`);
-  } else {
-    log(`Yjs синхронизация через Socket.IO на порту ${PORT}`);
-  }
+  log(`Yjs WebSocket endpoint доступен по пути /yjs на том же порту ${PORT}`);
 });
 
 // Graceful shutdown
@@ -425,10 +408,14 @@ process.on('SIGTERM', () => {
   log('Получен сигнал SIGTERM, завершаем работу сервера...');
   httpServer.close(() => {
     log('HTTP сервер закрыт');
-    yWebSocketServer.close(() => {
-      log('Yjs WebSocket сервер закрыт');
+    try {
+      yWebSocketServer.close(() => {
+        log('Yjs WebSocket сервер закрыт');
+        process.exit(0);
+      });
+    } catch {
       process.exit(0);
-    });
+    }
   });
 });
 
@@ -436,9 +423,13 @@ process.on('SIGINT', () => {
   log('Получен сигнал SIGINT, завершаем работу сервера...');
   httpServer.close(() => {
     log('HTTP сервер закрыт');
-    yWebSocketServer.close(() => {
-      log('Yjs WebSocket сервер закрыт');
+    try {
+      yWebSocketServer.close(() => {
+        log('Yjs WebSocket сервер закрыт');
+        process.exit(0);
+      });
+    } catch {
       process.exit(0);
-    });
+    }
   });
 });
