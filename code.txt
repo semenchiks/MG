@@ -1,0 +1,79 @@
+<!DOCTYPE html> 
+<html lang="ru"> 
+ <head>     
+  <meta charset="UTF-8">     
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+  <link rel="stylesheet" href="style.css">   
+  <title>Изображения</title>
+ </head>
+ <body>     
+  <div class="gallery">  
+   <!-- Рабоча зона команды 1-->                
+   <img class="img1" " alt="Изображение 1">          
+    
+   <!-- Рабоча зона команды 2-->              
+   <img class="img2" src="" alt="Изображение 2">         
+    
+   <!-- Рабоча зона команды 3-->            
+    <img class="img3" src="" alt="Изображение 3">            
+     
+   <!-- Рабоча зона команды 4-->            
+    <img class="img4" src="" alt="Изображение 4">    
+   
+      <div class="img2025"> 
+
+       </div>
+   </div> 
+   
+   </body> 
+  </html>
+
+body {     
+ display: flex;    
+ justify-content: center;     
+ align-items: center;     
+ height: 100vh;     
+ margin: 0;     
+ background-color: #f0f0f0; 
+}  
+
+.gallery {    
+ display: grid;     
+ grid-template-columns: repeat(2, 1fr);     /* 2 колонки */     
+ gap: 0px;     /* Расстояние между изображениями */ 
+}  
+
+.gallery img {     
+ width: 100%;     /* Ширина изображения 100% от ячейки */     
+ height: auto;     /* Автоматическая высота для сохранения пропорций */ } 
+
+/*Рабоча зона команды 1*/
+.img1 {    
+ max-width: 100%;     /* Адаптивная ширина */    
+ height: auto;     /* Автоматическая высота для сохранения пропорций */ 
+}  
+
+/*Рабоча зона команды 2*/
+.img2 {    
+ max-width: 100%;     /* Адаптивная ширина */    
+ height: auto;     /* Автоматическая высота для сохранения пропорций */ 
+}  
+
+/*Рабоча зона команды 3*/
+.img3 {    
+ max-width: 100%;     /* Адаптивная ширина */    
+ height: auto;     /* Автоматическая высота для сохранения пропорций */ 
+}  
+
+/*Рабоча зона команды 4*/
+.img4 {    
+ max-width: 100%;     /* Адаптивная ширина */    
+ height: auto;     /* Автоматическая высота для сохранения пропорций */ 
+}
+
+.img2025{
+  display:flex;
+  justify-content: center;     
+ align-items: center;
+  position:absolute;
+}
