@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ввод тегов HTML</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    html, body { overflow: auto; }
+    .wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { width: 100%; max-width: 720px; background: #ffffff; border: 3px solid var(--yellow-primary); border-radius: 16px; box-shadow: 0 8px 24px rgba(255,224,0,0.25); overflow: hidden; }
+    .card-header { background: linear-gradient(135deg, var(--yellow-primary), var(--yellow-hover)); color: #222; padding: 16px 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .card-body { padding: 20px; }
+    .question { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+    .inputs { display: grid; gap: 10px; }
+    .text-input { width: 100%; padding: 12px 14px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
+    .text-input:focus { border-color: var(--yellow-primary); box-shadow: 0 0 0 3px rgba(255,224,0,.25); }
+    .card-footer { display: flex; justify-content: center; padding: 16px 20px; border-top: 2px solid var(--yellow-primary); }
+    .btn { background: var(--yellow-primary); color: #222; border: 2px solid #222; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card" role="region" aria-label="Ввод тегов HTML">
+      <div class="card-header">
+        <i class="fa-regular fa-keyboard"></i>
+        <span>Ввод тегов HTML</span>
+      </div>
+      <div class="card-body">
+        <div class="question">Введите раннее изученные теги HTML</div>
+        <!-- Модалка имени -->
+        <div id="name-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+          <div style="background:#fff; border:3px solid var(--yellow-primary); border-radius: 12px; padding: 20px; width: 90%; max-width: 420px; box-shadow: 0 8px 24px rgba(255,224,0,.25);">
+            <div style="font-weight:800; font-size: 18px; margin-bottom: 12px;">Введите ваше имя</div>
+            <input type="text" id="user-name-input" class="text-input" placeholder="Ваше имя" aria-label="Ваше имя">
+            <div style="display:flex; justify-content:center; margin-top: 10px;">
+              <button class="btn" id="start-btn">Начать</button>
+            </div>
+          </div>
+        </div>
+        <div class="inputs" role="group" aria-label="Поля для ввода тегов">
+          <input type="text" class="text-input tag-input" placeholder="Тег 1" aria-label="Тег 1">
+          <input type="text" class="text-input tag-input" placeholder="Тег 2" aria-label="Тег 2">
+          <input type="text" class="text-input tag-input" placeholder="Тег 3" aria-label="Тег 3">
+          <input type="text" class="text-input tag-input" placeholder="Тег 4" aria-label="Тег 4">
+          <input type="text" class="text-input tag-input" placeholder="Тег 5" aria-label="Тег 5">
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn" id="submit-btn">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Подключаем Socket.IO
+    (function(){
+      const script = document.createElement('script');
+      script.src = 'https://cdn.socket.io/4.5.0/socket.io.min.js';
+      script.onload = () => {
+        const socket = io();
+        const storage = window.localStorage;
+        const clientKey = 'bubble_user_id';
+        const nameKey = 'bubble_user_name';
+        let clientId = storage.getItem(clientKey);
+        let userName = storage.getItem(nameKey) || '';
+        if (!clientId) {
+          clientId = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+          storage.setItem(clientKey, clientId);
+        }
+
+        const modal = document.getElementById('name-modal');
+        const startBtn = document.getElementById('start-btn');
+        const nameInput = document.getElementById('user-name-input');
+        if (userName) {
+          modal.style.display = 'none';
+          socket.emit('bubble_join', { clientId });
+        } else {
+          nameInput.focus();
+        }
+
+        startBtn.addEventListener('click', () => {
+          const val = (nameInput.value || '').trim();
+          if (!val) return;
+          userName = val;
+          storage.setItem(nameKey, userName);
+          modal.style.display = 'none';
+          socket.emit('bubble_join', { clientId });
+        });
+
+        const handleBeforeUnload = () => {
+          socket.emit('bubble_leave', { clientId });
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        document.getElementById('submit-btn').addEventListener('click', () => {
+          const inputs = Array.from(document.querySelectorAll('.tag-input'));
+          const tags = inputs.map(i => (i.value || '').trim()).filter(Boolean);
+          socket.emit('bubble_submit', { tags, clientId }, () => {
+            window.location.href = '/mainbubble';
+          });
+        });
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
+
